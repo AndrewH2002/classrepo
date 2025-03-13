@@ -1,0 +1,667 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Tone.js Web Synthesizer</title>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/tone/14.8.49/Tone.js"></script>
+  <style>
+    body {
+      font-family: 'Arial', sans-serif;
+      background-color: #121212;
+      color: #f0f0f0;
+      margin: 0;
+      padding: 20px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      min-height: 100vh;
+    }
+    
+    .container {
+      width: 100%;
+      max-width: 800px;
+    }
+    
+    h1 {
+      text-align: center;
+      color: #bb86fc;
+      margin-bottom: 30px;
+    }
+    
+    .synth-controls {
+      background-color: #1e1e1e;
+      border-radius: 10px;
+      padding: 20px;
+      margin-bottom: 30px;
+    }
+    
+    .control-group {
+      margin-bottom: 20px;
+    }
+    
+    .control-group h3 {
+      margin-top: 0;
+      color: #03dac6;
+    }
+    
+    .slider-container {
+      display: flex;
+      align-items: center;
+      margin-bottom: 10px;
+    }
+    
+    .slider-label {
+      width: 120px;
+      margin-right: 10px;
+    }
+    
+    .slider {
+      flex-grow: 1;
+      height: 5px;
+      -webkit-appearance: none;
+      background: #333;
+      border-radius: 5px;
+      outline: none;
+    }
+    
+    .slider::-webkit-slider-thumb {
+      -webkit-appearance: none;
+      width: 15px;
+      height: 15px;
+      border-radius: 50%;
+      background: #bb86fc;
+      cursor: pointer;
+    }
+    
+    .slider-value {
+      width: 60px;
+      text-align: right;
+      margin-left: 10px;
+    }
+    
+    .oscillator-buttons {
+      display: flex;
+      gap: 10px;
+      margin-bottom: 10px;
+    }
+    
+    .osc-button {
+      padding: 8px 15px;
+      background-color: #333;
+      border: none;
+      border-radius: 5px;
+      color: white;
+      cursor: pointer;
+      transition: background-color 0.3s;
+    }
+    
+    .osc-button.active {
+      background-color: #bb86fc;
+    }
+    
+    .keyboard {
+      display: flex;
+      position: relative;
+      height: 200px;
+      margin-bottom: 30px;
+    }
+    
+    .key {
+      border: 1px solid #000;
+      width: 50px;
+      height: 200px;
+      background-color: white;
+      border-radius: 0 0 5px 5px;
+      position: relative;
+      color: black;
+      display: flex;
+      flex-direction: column;
+      justify-content: flex-end;
+      align-items: center;
+      padding-bottom: 10px;
+      cursor: pointer;
+      transition: background-color 0.1s;
+    }
+    
+    .key.pressed {
+      background-color: #bb86fc;
+    }
+    
+    .key.black {
+      background-color: #333;
+      color: white;
+      width: 30px;
+      height: 120px;
+      position: absolute;
+      z-index: 1;
+    }
+    
+    .key-label {
+      font-weight: bold;
+      margin-bottom: 5px;
+    }
+    
+    .note-label {
+      font-size: 12px;
+      opacity: 0.8;
+    }
+    
+    #instructions {
+      background-color: #1e1e1e;
+      border-radius: 10px;
+      padding: 20px;
+      margin-top: 20px;
+      max-width: 800px;
+    }
+    
+    .toggle-container {
+      display: flex;
+      align-items: center;
+      margin-bottom: 10px;
+    }
+    
+    .toggle-label {
+      margin-right: 10px;
+    }
+    
+    .toggle {
+      position: relative;
+      display: inline-block;
+      width: 60px;
+      height: 28px;
+    }
+    
+    .toggle input {
+      opacity: 0;
+      width: 0;
+      height: 0;
+    }
+    
+    .toggle-slider {
+      position: absolute;
+      cursor: pointer;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background-color: #333;
+      transition: .4s;
+      border-radius: 34px;
+    }
+    
+    .toggle-slider:before {
+      position: absolute;
+      content: "";
+      height: 20px;
+      width: 20px;
+      left: 4px;
+      bottom: 4px;
+      background-color: white;
+      transition: .4s;
+      border-radius: 50%;
+    }
+    
+    input:checked + .toggle-slider {
+      background-color: #bb86fc;
+    }
+    
+    input:checked + .toggle-slider:before {
+      transform: translateX(32px);
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1>Tone.js Web Synthesizer</h1>
+    
+    <div class="synth-controls">
+      <div class="control-group">
+        <h3>Oscillator Type</h3>
+        <div class="oscillator-buttons">
+          <button class="osc-button active" data-type="sine">Sine</button>
+          <button class="osc-button" data-type="square">Square</button>
+          <button class="osc-button" data-type="triangle">Triangle</button>
+          <button class="osc-button" data-type="sawtooth">Sawtooth</button>
+        </div>
+      </div>
+      
+      <div class="control-group">
+        <h3>Envelope</h3>
+        <div class="slider-container">
+          <span class="slider-label">Attack</span>
+          <input type="range" min="0.001" max="2" step="0.001" value="0.1" class="slider" id="attack">
+          <span class="slider-value" id="attack-value">0.1s</span>
+        </div>
+        <div class="slider-container">
+          <span class="slider-label">Decay</span>
+          <input type="range" min="0.001" max="2" step="0.001" value="0.2" class="slider" id="decay">
+          <span class="slider-value" id="decay-value">0.2s</span>
+        </div>
+        <div class="slider-container">
+          <span class="slider-label">Sustain</span>
+          <input type="range" min="0" max="1" step="0.01" value="0.5" class="slider" id="sustain">
+          <span class="slider-value" id="sustain-value">0.5</span>
+        </div>
+        <div class="slider-container">
+          <span class="slider-label">Release</span>
+          <input type="range" min="0.001" max="5" step="0.001" value="0.5" class="slider" id="release">
+          <span class="slider-value" id="release-value">0.5s</span>
+        </div>
+      </div>
+      
+      <div class="control-group">
+        <h3>Effects</h3>
+        <div class="toggle-container">
+          <span class="toggle-label">Chorus</span>
+          <label class="toggle">
+            <input type="checkbox" id="chorus-toggle">
+            <span class="toggle-slider"></span>
+          </label>
+        </div>
+        <div class="slider-container">
+          <span class="slider-label">Chorus Depth</span>
+          <input type="range" min="0" max="1" step="0.01" value="0.5" class="slider" id="chorus-depth" disabled>
+          <span class="slider-value" id="chorus-depth-value">0.5</span>
+        </div>
+        <div class="slider-container">
+          <span class="slider-label">Chorus Rate</span>
+          <input type="range" min="0.1" max="10" step="0.1" value="2.5" class="slider" id="chorus-rate" disabled>
+          <span class="slider-value" id="chorus-rate-value">2.5Hz</span>
+        </div>
+        
+        <div class="toggle-container">
+          <span class="toggle-label">Delay</span>
+          <label class="toggle">
+            <input type="checkbox" id="delay-toggle">
+            <span class="toggle-slider"></span>
+          </label>
+        </div>
+        <div class="slider-container">
+          <span class="slider-label">Delay Time</span>
+          <input type="range" min="0.01" max="1" step="0.01" value="0.25" class="slider" id="delay-time" disabled>
+          <span class="slider-value" id="delay-time-value">0.25s</span>
+        </div>
+        <div class="slider-container">
+          <span class="slider-label">Delay Feedback</span>
+          <input type="range" min="0" max="0.9" step="0.01" value="0.4" class="slider" id="delay-feedback" disabled>
+          <span class="slider-value" id="delay-feedback-value">0.4</span>
+        </div>
+        
+        <div class="toggle-container">
+          <span class="toggle-label">Filter</span>
+          <label class="toggle">
+            <input type="checkbox" id="filter-toggle" checked>
+            <span class="toggle-slider"></span>
+          </label>
+        </div>
+        <div class="slider-container">
+          <span class="slider-label">Filter Cutoff</span>
+          <input type="range" min="50" max="10000" step="1" value="2000" class="slider" id="filter-freq">
+          <span class="slider-value" id="filter-freq-value">2000Hz</span>
+        </div>
+        <div class="slider-container">
+          <span class="slider-label">Filter Q</span>
+          <input type="range" min="0.1" max="20" step="0.1" value="1" class="slider" id="filter-q">
+          <span class="slider-value" id="filter-q-value">1</span>
+        </div>
+      </div>
+      
+      <div class="control-group">
+        <h3>Master</h3>
+        <div class="slider-container">
+          <span class="slider-label">Volume</span>
+          <input type="range" min="-60" max="0" step="0.1" value="-10" class="slider" id="volume">
+          <span class="slider-value" id="volume-value">-10dB</span>
+        </div>
+      </div>
+    </div>
+    
+    <div class="keyboard">
+      <!-- White keys -->
+      <div class="key" data-note="C4" data-key="a">
+        <span class="key-label">A</span>
+        <span class="note-label">C4</span>
+      </div>
+      <div class="key" data-note="D4" data-key="s">
+        <span class="key-label">S</span>
+        <span class="note-label">D4</span>
+      </div>
+      <div class="key" data-note="E4" data-key="d">
+        <span class="key-label">D</span>
+        <span class="note-label">E4</span>
+      </div>
+      <div class="key" data-note="F4" data-key="f">
+        <span class="key-label">F</span>
+        <span class="note-label">F4</span>
+      </div>
+      <div class="key" data-note="G4" data-key="g">
+        <span class="key-label">G</span>
+        <span class="note-label">G4</span>
+      </div>
+      <div class="key" data-note="A4" data-key="h">
+        <span class="key-label">H</span>
+        <span class="note-label">A4</span>
+      </div>
+      <div class="key" data-note="B4" data-key="j">
+        <span class="key-label">J</span>
+        <span class="note-label">B4</span>
+      </div>
+      <div class="key" data-note="C5" data-key="k">
+        <span class="key-label">K</span>
+        <span class="note-label">C5</span>
+      </div>
+      
+      <!-- Black keys -->
+      <div class="key black" style="left: 35px;" data-note="C#4" data-key="w">
+        <span class="key-label">W</span>
+        <span class="note-label">C#4</span>
+      </div>
+      <div class="key black" style="left: 85px;" data-note="D#4" data-key="e">
+        <span class="key-label">E</span>
+        <span class="note-label">D#4</span>
+      </div>
+      <div class="key black" style="left: 185px;" data-note="F#4" data-key="t">
+        <span class="key-label">T</span>
+        <span class="note-label">F#4</span>
+      </div>
+      <div class="key black" style="left: 235px;" data-note="G#4" data-key="y">
+        <span class="key-label">Y</span>
+        <span class="note-label">G#4</span>
+      </div>
+      <div class="key black" style="left: 285px;" data-note="A#4" data-key="u">
+        <span class="key-label">U</span>
+        <span class="note-label">A#4</span>
+      </div>
+    </div>
+    
+    <div id="instructions">
+      <h3>How to Play</h3>
+      <p>Use your computer keyboard to play notes:</p>
+      <p>White keys: A, S, D, F, G, H, J, K (C4 to C5)</p>
+      <p>Black keys: W, E, T, Y, U (C#4 to A#4)</p>
+      <p>Adjust the synthesizer settings above to customize your sound!</p>
+    </div>
+  </div>
+
+  <script>
+    // Initialize Tone.js synth and effects
+    let synth, filter, chorus, delay, lfo;
+    let activeNotes = {};
+    let context;
+    
+    // Create audio context on user interaction to comply with browser autoplay policies
+    function initAudio() {
+      if (!context) {
+        context = Tone.context;
+        Tone.start();
+        
+        // Create effects
+        filter = new Tone.Filter({
+          type: "lowpass",
+          frequency: 2000,
+          Q: 1
+        });
+        
+        chorus = new Tone.Chorus({
+          frequency: 2.5,
+          delayTime: 3.5,
+          depth: 0.5,
+          type: "sine",
+          spread: 180,
+          wet: 0
+        }).start();
+        
+        delay = new Tone.FeedbackDelay({
+          delayTime: 0.25,
+          feedback: 0.4,
+          wet: 0
+        });
+        
+        // Create LFO to modulate filter frequency
+        lfo = new Tone.LFO({
+          frequency: 0.1,
+          min: 400,
+          max: 4000
+        }).start();
+        
+        // Create synth
+        synth = new Tone.PolySynth(Tone.Synth, {
+          oscillator: {
+            type: "sine"
+          },
+          envelope: {
+            attack: 0.1,
+            decay: 0.2,
+            sustain: 0.5,
+            release: 0.5
+          }
+        }).chain(filter, chorus, delay, Tone.Destination);
+        
+        // Set master volume
+        Tone.Destination.volume.value = -10;
+        
+        // Setup UI controls
+        setupControls();
+        document.removeEventListener("click", initAudio);
+        document.removeEventListener("keydown", initAudio);
+      }
+    }
+    
+    document.addEventListener("click", initAudio);
+    document.addEventListener("keydown", initAudio);
+    
+    // Setup keyboard events
+    document.addEventListener("keydown", (e) => {
+      if (!context) return;
+      
+      const key = e.key.toLowerCase();
+      const keyElement = document.querySelector(`.key[data-key="${key}"]`);
+      
+      if (keyElement && !activeNotes[key]) {
+        const note = keyElement.dataset.note;
+        activeNotes[key] = note;
+        
+        // Play the note
+        synth.triggerAttack(note);
+        
+        // Add visual indicator
+        keyElement.classList.add("pressed");
+      }
+    });
+    
+    document.addEventListener("keyup", (e) => {
+      if (!context) return;
+      
+      const key = e.key.toLowerCase();
+      const keyElement = document.querySelector(`.key[data-key="${key}"]`);
+      
+      if (keyElement && activeNotes[key]) {
+        const note = activeNotes[key];
+        
+        // Release the note
+        synth.triggerRelease(note);
+        
+        // Remove visual indicator
+        keyElement.classList.remove("pressed");
+        
+        // Remove from active notes
+        delete activeNotes[key];
+      }
+    });
+    
+    // Mouse events for keyboard
+    document.querySelectorAll(".key").forEach(key => {
+      key.addEventListener("mousedown", () => {
+        if (!context) initAudio();
+        
+        const note = key.dataset.note;
+        synth.triggerAttack(note);
+        key.classList.add("pressed");
+      });
+      
+      key.addEventListener("mouseup", () => {
+        const note = key.dataset.note;
+        synth.triggerRelease(note);
+        key.classList.remove("pressed");
+      });
+      
+      key.addEventListener("mouseleave", () => {
+        if (key.classList.contains("pressed")) {
+          const note = key.dataset.note;
+          synth.triggerRelease(note);
+          key.classList.remove("pressed");
+        }
+      });
+    });
+    
+    // Setup UI controls
+    function setupControls() {
+      // Oscillator type buttons
+      document.querySelectorAll(".osc-button").forEach(btn => {
+        btn.addEventListener("click", () => {
+          document.querySelectorAll(".osc-button").forEach(b => b.classList.remove("active"));
+          btn.classList.add("active");
+          
+          const type = btn.dataset.type;
+          synth.set({
+            oscillator: {
+              type: type
+            }
+          });
+        });
+      });
+      
+      // Envelope controls
+      document.getElementById("attack").addEventListener("input", (e) => {
+        const value = parseFloat(e.target.value);
+        document.getElementById("attack-value").textContent = value.toFixed(3) + "s";
+        synth.set({
+          envelope: {
+            attack: value
+          }
+        });
+      });
+      
+      document.getElementById("decay").addEventListener("input", (e) => {
+        const value = parseFloat(e.target.value);
+        document.getElementById("decay-value").textContent = value.toFixed(3) + "s";
+        synth.set({
+          envelope: {
+            decay: value
+          }
+        });
+      });
+      
+      document.getElementById("sustain").addEventListener("input", (e) => {
+        const value = parseFloat(e.target.value);
+        document.getElementById("sustain-value").textContent = value.toFixed(2);
+        synth.set({
+          envelope: {
+            sustain: value
+          }
+        });
+      });
+      
+      document.getElementById("release").addEventListener("input", (e) => {
+        const value = parseFloat(e.target.value);
+        document.getElementById("release-value").textContent = value.toFixed(3) + "s";
+        synth.set({
+          envelope: {
+            release: value
+          }
+        });
+      });
+      
+      // Filter controls
+      const filterToggle = document.getElementById("filter-toggle");
+      filterToggle.addEventListener("change", () => {
+        if (filterToggle.checked) {
+          filter.frequency.value = document.getElementById("filter-freq").value;
+          filter.Q.value = document.getElementById("filter-q").value;
+        } else {
+          filter.frequency.value = 20000; // Effectively bypasses the filter
+          filter.Q.value = 0.1;
+        }
+      });
+      
+      document.getElementById("filter-freq").addEventListener("input", (e) => {
+        const value = parseFloat(e.target.value);
+        document.getElementById("filter-freq-value").textContent = value + "Hz";
+        filter.frequency.value = value;
+      });
+      
+      document.getElementById("filter-q").addEventListener("input", (e) => {
+        const value = parseFloat(e.target.value);
+        document.getElementById("filter-q-value").textContent = value.toFixed(1);
+        filter.Q.value = value;
+      });
+      
+      // Chorus controls
+      const chorusToggle = document.getElementById("chorus-toggle");
+      const chorusDepthSlider = document.getElementById("chorus-depth");
+      const chorusRateSlider = document.getElementById("chorus-rate");
+      
+      chorusToggle.addEventListener("change", () => {
+        if (chorusToggle.checked) {
+          chorus.wet.value = 1;
+          chorusDepthSlider.disabled = false;
+          chorusRateSlider.disabled = false;
+        } else {
+          chorus.wet.value = 0;
+          chorusDepthSlider.disabled = true;
+          chorusRateSlider.disabled = true;
+        }
+      });
+      
+      chorusDepthSlider.addEventListener("input", (e) => {
+        const value = parseFloat(e.target.value);
+        document.getElementById("chorus-depth-value").textContent = value.toFixed(2);
+        chorus.depth = value;
+      });
+      
+      chorusRateSlider.addEventListener("input", (e) => {
+        const value = parseFloat(e.target.value);
+        document.getElementById("chorus-rate-value").textContent = value.toFixed(1) + "Hz";
+        chorus.frequency.value = value;
+      });
+      
+      // Delay controls
+      const delayToggle = document.getElementById("delay-toggle");
+      const delayTimeSlider = document.getElementById("delay-time");
+      const delayFeedbackSlider = document.getElementById("delay-feedback");
+      
+      delayToggle.addEventListener("change", () => {
+        if (delayToggle.checked) {
+          delay.wet.value = 0.5;
+          delayTimeSlider.disabled = false;
+          delayFeedbackSlider.disabled = false;
+        } else {
+          delay.wet.value = 0;
+          delayTimeSlider.disabled = true;
+          delayFeedbackSlider.disabled = true;
+        }
+      });
+      
+      delayTimeSlider.addEventListener("input", (e) => {
+        const value = parseFloat(e.target.value);
+        document.getElementById("delay-time-value").textContent = value.toFixed(2) + "s";
+        delay.delayTime.value = value;
+      });
+      
+      delayFeedbackSlider.addEventListener("input", (e) => {
+        const value = parseFloat(e.target.value);
+        document.getElementById("delay-feedback-value").textContent = value.toFixed(2);
+        delay.feedback.value = value;
+      });
+      
+      // Master volume
+      document.getElementById("volume").addEventListener("input", (e) => {
+        const value = parseFloat(e.target.value);
+        document.getElementById("volume-value").textContent = value.toFixed(1) + "dB";
+        Tone.Destination.volume.value = value;
+      });
+    }
+  </script>
+</body>
+</html>
