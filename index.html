@@ -1,0 +1,281 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Rhythm Pulse - Interactive Audiovisual Experience</title>
+    <style>
+        /* Global Styles */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            line-height: 1.6;
+            color: #333;
+            background-color: #f8f8f8;
+        }
+        
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 20px;
+        }
+        
+        header {
+            background: linear-gradient(135deg, #6e24f7 0%, #24a0f7 100%);
+            color: white;
+            padding: 60px 0;
+            text-align: center;
+        }
+        
+        h1 {
+            font-size: 3rem;
+            margin-bottom: 10px;
+        }
+        
+        h2 {
+            font-size: 2.2rem;
+            margin: 40px 0 20px;
+            color: #6e24f7;
+        }
+        
+        h3 {
+            font-size: 1.5rem;
+            margin: 30px 0 15px;
+            color: #222; /* Changed to darker color */
+        }
+        
+        p {
+            margin-bottom: 20px;
+            font-size: 1.1rem;
+        }
+        
+        .lead {
+            font-size: 1.4rem;
+            margin-bottom: 30px;
+        }
+        
+        section {
+            padding: 50px 0;
+        }
+        
+        .section-dark {
+            background-color: #2c2c2c;
+        }
+        
+        .section-dark h2 {
+            color: #a2d6ff;
+        }
+        
+        .section-dark h3 {
+            color: #222; /* Dark color for contrast with white card background */
+        }
+        
+        .section-dark p, .section-dark li {
+            color: #ffffff;  /* White text for dark sections */
+        }
+        
+        .img-container {
+            margin: 30px 0;
+            text-align: center;
+        }
+        
+        .img-container img {
+            max-width: 100%;
+            border-radius: 5px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            background-color: #fff;
+            padding: 10px;
+        }
+        
+        .video-container {
+            position: relative;
+            width: 100%;
+            padding-bottom: 56.25%; /* 16:9 Aspect Ratio */
+            margin: 30px 0;
+        }
+        
+        .video-container iframe {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            border-radius: 5px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        }
+        
+        .grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 30px;
+            margin: 30px 0;
+        }
+        
+        .card {
+            background-color: white;
+            border-radius: 5px;
+            padding: 30px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            transition: transform 0.3s ease;
+            color: #333; /* Dark text for cards */
+        }
+        
+        .card:hover {
+            transform: translateY(-5px);
+        }
+        
+        .card h3 {
+            margin-top: 0;
+            color: #6e24f7; /* Purple color for better visibility */
+            font-weight: bold; /* Make it bold */
+        }
+        
+        /* THIS IS THE CRITICAL FIX - Ensure card text is dark */
+        .card p, .card li {
+            color: #333 !important; /* IMPORTANT to override any other styles */
+            font-weight: normal;
+        }
+        
+        footer {
+            background-color: #333;
+            color: white;
+            text-align: center;
+            padding: 30px 0;
+            margin-top: 50px;
+        }
+        
+        ul {
+            margin-left: 20px;
+            margin-bottom: 20px;
+        }
+        
+        li {
+            margin-bottom: 10px;
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <div class="container">
+            <h1>Rhythm Pulse</h1>
+            <p class="lead">An Interactive Audiovisual Experience</p>
+        </div>
+    </header>
+
+    <section>
+        <div class="container">
+            <h2>Project Outline</h2>
+            <p>Rhythm Pulse is an interactive audiovisual installation that creates a dynamic relationship between sound, light, and motion. The project combines Arduino-based physical inputs, real-time audio synthesis, and visual feedback to create an immersive experience where users can manipulate sound and visuals simultaneously.</p>
+            
+            <p>The core concept explores how different sensory inputs can control and influence various aspects of a generative audiovisual composition. By turning knobs, pressing buttons, and altering light levels, users can discover how their physical interactions transform into digital experiences.</p>
+            
+            <div class="video-container">
+                <iframe src="https://www.youtube.com/embed/oImFB593lpM" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
+            </div>
+        </div>
+    </section>
+
+    <section class="section-dark">
+        <div class="container">
+            <h2>Project Description</h2>
+            <p>Rhythm Pulse creates an abstract audiovisual environment where geometric shapes respond to music generated in real-time. At its heart, the project explores the relationship between physical interaction and digital response through three main components:</p>
+            
+            <div class="grid">
+                <div class="card">
+                    <h3>Physical Interface</h3>
+                    <p>The physical interface consists of three input methods:</p>
+                    <ul>
+                        <li>A potentiometer that controls the size of geometric shapes</li>
+                        <li>A button that toggles between different audio modes</li>
+                        <li>A photoresistor that responds to ambient light and controls the color palette</li>
+                    </ul>
+                    <p>These inputs allow for intuitive interaction with the digital elements. As users turn the potentiometer, shapes grow and shrink; when they press the button, the audio changes character; when they cover the light sensor, colors shift across the spectrum.</p>
+                </div>
+                
+                <div class="card">
+                    <h3>Visual Environment</h3>
+                    <p>The visual environment consists of geometric shapes (circles, squares, and triangles) that respond to audio frequencies:</p>
+                    <ul>
+                        <li>Shapes change size based on potentiometer input and bass frequencies</li>
+                        <li>Shapes rotate based on mid-range frequencies</li>
+                        <li>Shapes move based on treble frequencies</li>
+                        <li>Colors change based on light sensor readings</li>
+                        <li>Particles appear with each beat, creating a dynamic visual rhythm</li>
+                    </ul>
+                </div>
+                
+                <div class="card">
+                    <h3>Sound Generation</h3>
+                    <p>The audio component uses Tone.js to generate synthesized sounds:</p>
+                    <ul>
+                        <li>A drone synthesizer provides a continuous tonal foundation</li>
+                        <li>A melodic synthesizer plays patterns of notes that change with button presses</li>
+                        <li>A percussion synthesizer creates rhythmic beats</li>
+                        <li>Audio parameters are modulated in real-time based on user input</li>
+                        <li>Frequency analysis drives both visual reactions and LED outputs</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <section>
+        <div class="container">
+            <h2>Technical Implementation</h2>
+            <p>The project integrates three key technologies:</p>
+            
+            <ol>
+                <li><strong>Arduino</strong>: Handles physical inputs and outputs through analog and digital pins</li>
+                <li><strong>p5.js</strong>: Creates the visual environment and manages the overall application</li>
+                <li><strong>Tone.js</strong>: Generates and manipulates audio in real-time</li>
+            </ol>
+            
+            <p>Data flows bidirectionally between the systems:</p>
+            <ul>
+                <li>Arduino sends sensor data to the p5.js application via serial communication</li>
+                <li>p5.js processes this data to control both visuals and audio parameters</li>
+                <li>Tone.js generates audio and provides frequency analysis</li>
+                <li>p5.js sends frequency data back to Arduino to control LEDs</li>
+            </ul>
+            
+            <h3>Circuit Diagram</h3>
+            <div class="img-container">
+                <img src="circuit.jpg" alt="Circuit Diagram for Rhythm Pulse" width="800">
+            </div>
+            
+            <h3>Hardware Components</h3>
+            <ul>
+                <li>Arduino UNO</li>
+                <li>Potentiometer (250kΩ) connected to A0</li>
+                <li>Push button connected to D3</li>
+                <li>Photoresistor with voltage divider connected to A1</li>
+                <li>Three LEDs with 1kΩ resistors connected to pins D9, D10, and D11</li>
+            </ul>
+        </div>
+    </section>
+
+    <section>
+        <div class="container">
+            <h2>Reflections</h2>
+            <p>Creating Rhythm Pulse taught me valuable lessons about integrating physical computing with digital media. The challenge of synchronizing multiple systems in real-time pushed me to explore efficient communication protocols and optimize performance.</p>
+            
+            <p>I found that physical interfaces provide an intuitive entry point for users to engage with digital art. There's something fundamentally satisfying about turning a physical knob and seeing immediate visual feedback that purely screen-based interactions can't match.</p>
+            
+            <p>The most challenging aspect was ensuring stability across all systems while maintaining responsiveness. Finding the right balance between visual complexity and performance required careful testing and refinement.</p>
+            
+            <p>Moving forward, I'm excited to explore more complex interactions between physical and digital elements, and to continue developing immersive experiences that bridge these worlds.</p>
+        </div>
+    </section>
+
+    <footer>
+        <div class="container">
+            <p>Rhythm Pulse &copy; 2025 | Andrew Holden | Created for CSC 2463</p>
+        </div>
+    </footer>
+</body>
+</html>
